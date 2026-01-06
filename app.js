@@ -46,3 +46,19 @@ function generateInjectJS() {
 })();
 </script>`;
 }
+const PASSWORD = "SeoMafiaWeb88"; // ganti sendiri
+
+function login() {
+  if (document.getElementById("pass").value === PASSWORD) {
+    localStorage.setItem("auth", "1");
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("panel").style.display = "block";
+  } else {
+    alert("Password salah");
+  }
+}
+
+if (localStorage.getItem("auth") === "1") {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("panel").style.display = "block";
+}
