@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Bunker Panel</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Bunker Anchors</h1>
+  <button id="mode">Dark Mode</button>
+</header>
+
+<section>
+  <h2>Bunker Anchors</h2>
+  <textarea id="anchors" placeholder="anchor | url"></textarea>
+  <button onclick="saveAnchors()">Save</button>
+</section>
+
+<section>
+  <h2>Template Artikel (Spin)</h2>
+  <textarea id="template" placeholder="Gunakan {ANCHOR}"></textarea>
+  <button onclick="previewSpin()">Preview Spin</button>
+</section>
+
+<section>
+  <h2>Hasil Spin</h2>
+  <div id="result"></div>
+</section>
+
+<section>
+  <h2>Inject JS</h2>
+  <textarea id="inject" readonly></textarea>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
