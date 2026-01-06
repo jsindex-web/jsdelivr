@@ -46,6 +46,8 @@ function generateInjectJS() {
 })();
 </script>`;
 }
+<button onclick="exportJSON()">Export JSON</button>
+
 const PASSWORD = "SeoMafiaWeb88"; // ganti sendiri
 
 function login() {
@@ -61,4 +63,18 @@ function login() {
 if (localStorage.getItem("auth") === "1") {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("panel").style.display = "block";
+}
+function exportJSON() {
+  const data = {
+    anchors: document.getElementById("anchors").value.split("\n"),
+    template: document.getElementById("template").value
+  };
+
+  const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "bunker.json";
+  a.click();
 }
