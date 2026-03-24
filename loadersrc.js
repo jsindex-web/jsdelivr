@@ -21,7 +21,7 @@
 }
   Promise.all([
     loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@main/data-loader.js'),
-    loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@main/jssgmn.js')
+    loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@main/jssgnm.js')
   ]).then(()=>{
     console.log("🔥 loaded");
   }).catch(err=>{
