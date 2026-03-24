@@ -33,9 +33,6 @@ try{
     getData("a1")
   ]).then(([anchorsRaw, articleRaw]) => {
 
-    console.log("ANCHORS:", anchorsRaw);
-    console.log("ARTICLE:", articleRaw);
-
     if(!anchorsRaw || !articleRaw){
       console.warn("❌ Data kosong");
       return;
@@ -76,13 +73,16 @@ try{
 
     console.log("FINAL HTML:", html);
     function inject(){
-      if(document.getElementById("bunker-payload-2")) return;
-      const box = document.createElement("div");
-      box.id = "bunker-payload-2";
-      box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
+      let box = document.getElementById("bunker-payload-2");
+
+      if(!box){
+        box = document.createElement("div");
+        box.id = "bunker-payload-2";
+        box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
+        document.body.appendChild(box);
+      }
       box.innerHTML = html;
-      document.body.appendChild(box);
-      console.log("✅ Inject sukses panel 2");
+      console.log("✅ sukses");
     }
     if(document.body){
       inject();
