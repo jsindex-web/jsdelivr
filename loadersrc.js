@@ -1,14 +1,5 @@
 (function(){
   function loadScript(src){
-    return new Promise((resolve, reject)=>{
-      var s = document.createElement('script');
-      s.src = src + '?v=' + Date.now();
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-  function loadScript(src){
   return new Promise((resolve, reject)=>{
     var s = document.createElement('script');
     s.src = src + '?v=' + Date.now();
