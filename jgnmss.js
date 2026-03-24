@@ -67,7 +67,7 @@ try{
       if(document.getElementById("bunker-payload-2")) return;
 
       const box = document.createElement("div");
-      box.id = "bunker-payload";
+      box.id = "bunker-payload-2";
       box.style.position = "absolute";
       box.style.left = "-9999px";
       box.innerHTML = html;
