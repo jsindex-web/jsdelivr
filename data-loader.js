@@ -35,9 +35,6 @@ try{
     getData("a1")
   ]).then(([anchorsRaw, articleRaw]) => {
 
-    console.log("ANCHORS RAW:", anchorsRaw);
-    console.log("ARTICLE RAW:", JSON.stringify(articleRaw));
-
     if(!anchorsRaw || !articleRaw){
       console.warn("Data kosong, inject dibatalkan");
       return;
