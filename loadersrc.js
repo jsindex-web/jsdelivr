@@ -10,10 +10,12 @@
   }
 
   Promise.all([
-    loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@refs/heads/main/data-loaders.js'),
-    loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@refs/heads/main/jgssnm.js')
+    loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@refs/heads/main/data-loader.js'),
+    loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@refs/heads/main/jgnmss.js')
   ]).then(()=>{
     console.log("🔥 loaded parallel");
+  }).catch(err=>{
+    console.error("Script load error:", err);
   });
 
 })();
