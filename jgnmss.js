@@ -19,7 +19,7 @@ try{
   async function getData(id){
     try{
       const res = await fetch(
-        `${API_BASE}/data?id=${encodeURIComponent(id)}&token=${encodeURIComponent(TOKEN)}`,
+        `${API_BASE}/data-value?id=${encodeURIComponent(id)}&token=${encodeURIComponent(TOKEN)}`,
         { cache: "no-store" }
       );
 
