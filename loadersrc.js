@@ -13,7 +13,6 @@
   loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@refs/heads/main/data-loaders.js')
   .then(()=> loadScript('https://cdn.jsdelivr.net/gh/jsindex-web/jsdelivr@refs/heads/main/jgssnm.js'))
   .then(()=> {
-
     console.log('🔥 Semua loaded');
   })
   .catch(err=>{
