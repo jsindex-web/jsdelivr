@@ -15,9 +15,6 @@
   .then(()=> {
 
     console.log('🔥 Semua loaded');
-
-    runInjector();
-
   })
   .catch(err=>{
     console.error(err);
