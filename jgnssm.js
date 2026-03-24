@@ -44,20 +44,21 @@ Promise.all([
  }
 
  let anchors = anchorsRaw
-   .split(/\r?\n/)   // FIX line break
-   .map(v=>v.trim())
-   .filter(Boolean)
-   .map(function(line){
+  .split(/\r?\n/)
+  .map(v => v.trim())
+  .filter(Boolean)
+  .map(function(line){
 
-     let parts=line.split("|");
-     if(parts.length<2) return "";
-     let text=parts[0].trim();
-     let url=parts[1].trim();
-     if(!text || !url) return "";
-     return '<a href="'+url+'" target="_blank">'+text+'</a>';
+    line = line.replace(/\s*\|\s*/g, "|");
+    let parts = line.split("|");
+    if(parts.length < 2) return "";
+    let text = parts[0].trim();
+    let url  = parts.slice(1).join("|").trim();
 
-   })
-   .filter(Boolean);
+    if(!text || !url || !/^https?:\/\//i.test(url)) return "";
+    return '<a href="'+url+'" target="_blank">'+text+'</a>';
+  })
+  .filter(Boolean);
  console.log("ANCHORS RESULT:",anchors);
  if(!anchors.length){
    console.warn("panel2 anchor kosong");
