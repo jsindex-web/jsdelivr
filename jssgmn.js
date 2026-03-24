@@ -2,7 +2,18 @@
 try{
 
   if(document.getElementById("bunker-payload-2")) return;
-  const DEBUG = localStorage.getItem("debug_panel2") === "1";
+  const DEBUG = (() => {
+    try {
+      return localStorage.getItem("debug_panel2") === "1";
+    } catch(e){
+      return false;
+    }
+  })();
+
+  const log  = (...a) => { if(DEBUG) console.log(...a); };
+  const warn = (...a) => { if(DEBUG) console.warn(...a); };
+  const error = (...a) => { if(DEBUG) console.error(...a); };
+
   const API_BASE = "https://smw-queryjs.data-deliver.workers.dev";
   const TOKEN = "seo_mafia_web";
   const decode = (s) => {
@@ -30,10 +41,12 @@ try{
       return "";
     }
   }
+
   Promise.all([
     getData("a1"),
     getData("b1")
   ]).then(([anchorsRaw, articleRaw]) => {
+    
     if(!anchorsRaw || !articleRaw){
       warn("Data panel2 kosong");
       return;
@@ -42,7 +55,6 @@ try{
       .replace(/\r/g,"")
       .replace(/"/g,"")
       .trim();
-
     articleRaw = articleRaw.trim();
     const anchors = anchorsRaw
       .split("\n")
@@ -87,6 +99,6 @@ try{
     log("✅ panel2 inject sukses");
   }
 }catch(e){
-  error("panel2 fatal error:", e);
+  console.error("panel2 fatal error:", e);
 }
 }();
