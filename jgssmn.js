@@ -33,8 +33,6 @@ try{
     getData("a1"),
     getData("b1")
   ]).then(([anchorsRaw, articleRaw]) => {
-    console.log("RAW ANCHORS:", anchorsRaw);
-    console.log("RAW ARTICLE:", articleRaw);
     if(!anchorsRaw || !articleRaw){
       console.warn("Data panel2 kosong");
       return;
